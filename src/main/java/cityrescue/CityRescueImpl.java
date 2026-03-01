@@ -35,10 +35,14 @@ public class CityRescueImpl implements CityRescue {
         incidents = new Incident[200];
     }
 
+    /**
+     * Returns width and height of the active map/grid.
+     * 
+     * @return Array containing {width, height}
+     */
     @Override
     public int[] getGridSize() {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new int[] { map.mapWidth, map.mapHeight };
     }
 
     @Override
