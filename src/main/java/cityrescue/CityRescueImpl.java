@@ -174,7 +174,16 @@ public class CityRescueImpl implements CityRescue {
 
     @Override
     public String getStatus() {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        String status = "";
+        status += "TICK=" + tick;
+        status += String.format("\nSTATIONS=%d UNITS=%d INCIDENTS=%d OBSTACLES=%d",
+                stationsCounter, unitsCounter,
+                incidentsCounter, map.obstaclesCounter);
+        status += "\nINCIDENTS";
+        // TODO: Implement listing of incidents
+        status += "\nUNITS";
+        // TODO: Implement listing of units
+
+        return status;
     }
 }
