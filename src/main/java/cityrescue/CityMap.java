@@ -1,5 +1,7 @@
 package cityrescue;
 
+import cityrescue.exceptions.InvalidLocationException;
+
 public class CityMap {
     int mapWidth;
     int mapHeight;
@@ -12,6 +14,22 @@ public class CityMap {
         mapWidth = width;
         mapHeight = height;
         obstacles = new boolean[width][height];
+    }
+
+    public void addObstacle(int x, int y) throws InvalidLocationException {
+        try {
+            obstacles[x][y] = true;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new InvalidLocationException("Location out of bounds");
+        }
+    }
+
+    public void removeObstacle(int x, int y) throws InvalidLocationException {
+        try {
+            obstacles[x][y] = false;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new InvalidLocationException("Location out of bounds");
+        }
     }
 
     public boolean checkMoveIsLegal() {
