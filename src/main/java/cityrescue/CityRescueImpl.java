@@ -9,6 +9,10 @@ public class CityRescueImpl implements CityRescue {
     Station[] stations;
     Unit[] units;
     Incident[] incidents;
+    // Counters (to store current number of items)
+    int stationsCounter = 0;
+    int unitsCounter = 0;
+    int incidentsCounter = 0;
 
     /**
      * Initialises the CityRescue class by resetting state variables to their
@@ -33,6 +37,10 @@ public class CityRescueImpl implements CityRescue {
         stations = new Station[20];
         units = new Unit[50];
         incidents = new Incident[200];
+        // Reset counters
+        stationsCounter = 0;
+        unitsCounter = 0;
+        incidentsCounter = 0;
     }
 
     /**

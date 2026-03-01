@@ -4,6 +4,7 @@ public class CityMap {
     int mapWidth;
     int mapHeight;
     boolean[][] obstacles;
+    int obstaclesCounter = 0;
 
     public CityMap(int width, int height) {
         // Stores provided grid dimensions and initialises array to store
