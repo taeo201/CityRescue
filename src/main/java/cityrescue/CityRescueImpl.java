@@ -3,20 +3,36 @@ package cityrescue;
 import cityrescue.enums.*;
 import cityrescue.exceptions.*;
 
-/**
- * CityRescueImpl (Starter)
- *
- * Your task is to implement the full specification.
- * You may add additional classes in any package(s) you like.
- */
 public class CityRescueImpl implements CityRescue {
+    int tick = 0;
+    CityMap map;
+    Station[] stations;
+    Unit[] units;
+    Incident[] incidents;
 
-    // TODO: add fields (map, arrays for stations/units/incidents, counters, tick, etc.)
-
+    /**
+     * Initialises the CityRescue class by resetting state variables to their
+     * initial values and creating a map of the specified width and
+     * height (which must be positive integers).
+     * 
+     * @param width  the positive width of the map
+     * @param height the positive height of the map
+     * @throws InvalidGridException if width or height is negative or zero
+     */
     @Override
     public void initialise(int width, int height) throws InvalidGridException {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        // Guard clause to check preconditions
+        if (width <= 0 || height <= 0) {
+            throw new InvalidGridException(
+                    "Invalid grid size (width and height) specified. Width and height must be greater than zero");
+        }
+
+        // Reset state variables to initial values
+        tick = 0;
+        map = new CityMap(width, height);
+        stations = new Station[20];
+        units = new Unit[50];
+        incidents = new Incident[200];
     }
 
     @Override
@@ -50,7 +66,8 @@ public class CityRescueImpl implements CityRescue {
     }
 
     @Override
-    public void setStationCapacity(int stationId, int maxUnits) throws IDNotRecognisedException, InvalidCapacityException {
+    public void setStationCapacity(int stationId, int maxUnits)
+            throws IDNotRecognisedException, InvalidCapacityException {
         // TODO: implement
         throw new UnsupportedOperationException("Not implemented yet");
     }
@@ -62,7 +79,8 @@ public class CityRescueImpl implements CityRescue {
     }
 
     @Override
-    public int addUnit(int stationId, UnitType type) throws IDNotRecognisedException, InvalidUnitException, IllegalStateException {
+    public int addUnit(int stationId, UnitType type)
+            throws IDNotRecognisedException, InvalidUnitException, IllegalStateException {
         // TODO: implement
         throw new UnsupportedOperationException("Not implemented yet");
     }
@@ -80,7 +98,8 @@ public class CityRescueImpl implements CityRescue {
     }
 
     @Override
-    public void setUnitOutOfService(int unitId, boolean outOfService) throws IDNotRecognisedException, IllegalStateException {
+    public void setUnitOutOfService(int unitId, boolean outOfService)
+            throws IDNotRecognisedException, IllegalStateException {
         // TODO: implement
         throw new UnsupportedOperationException("Not implemented yet");
     }
@@ -98,7 +117,8 @@ public class CityRescueImpl implements CityRescue {
     }
 
     @Override
-    public int reportIncident(IncidentType type, int severity, int x, int y) throws InvalidSeverityException, InvalidLocationException {
+    public int reportIncident(IncidentType type, int severity, int x, int y)
+            throws InvalidSeverityException, InvalidLocationException {
         // TODO: implement
         throw new UnsupportedOperationException("Not implemented yet");
     }
@@ -110,7 +130,8 @@ public class CityRescueImpl implements CityRescue {
     }
 
     @Override
-    public void escalateIncident(int incidentId, int newSeverity) throws IDNotRecognisedException, InvalidSeverityException, IllegalStateException {
+    public void escalateIncident(int incidentId, int newSeverity)
+            throws IDNotRecognisedException, InvalidSeverityException, IllegalStateException {
         // TODO: implement
         throw new UnsupportedOperationException("Not implemented yet");
     }
