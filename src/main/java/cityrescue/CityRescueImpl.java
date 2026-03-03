@@ -152,6 +152,19 @@ public class CityRescueImpl implements CityRescue {
     @Override
     public void setStationCapacity(int stationId, int maxUnits)
             throws IDNotRecognisedException, InvalidCapacityException {
+        // Use utility function to find station
+        Station station = getStation(stationId);
+        // Guard clauses to check if capacity is valid
+        if (maxUnits <= 0) {
+            throw new InvalidCapacityException("Given station capacity must be greater than zero");
+        }
+        // TODO: Add guard clause to check if current number of units is less than new
+        // capacity
+        station.capacity = maxUnits;
+    }
+
+    // Private utility function since functionality is used in multiple methods
+    private Station getStation(int stationId) throws IDNotRecognisedException {
         // Search for a station with the given ID
         Station station = null;
         for (int i = 0; i < stations.length; i++) {
@@ -164,13 +177,7 @@ public class CityRescueImpl implements CityRescue {
         if (station == null) {
             throw new IDNotRecognisedException("Station with given stationId does not exist");
         }
-        // Guard clauses to check if capacity is valid
-        if (maxUnits <= 0) {
-            throw new InvalidCapacityException("Given station capacity must be greater than zero");
-        }
-        // TODO: Add guard clause to check if current number of units is less than new
-        // capacity
-        station.capacity = maxUnits;
+        return station;
     }
 
     /**
