@@ -134,7 +134,9 @@ public class CityRescueImpl implements CityRescue {
             throw new IDNotRecognisedException("Station with given stationId does not exist");
         }
         // Guard clause to check if station owns any units
-        // TODO: Check if station owns any units before deleting
+        if (station.unitsCounter > 0) {
+            throw new IllegalStateException("The station can not be deleted because it still has units assigned to it");
+        }
 
         // Delete station
         stations[stationIndex] = null;
