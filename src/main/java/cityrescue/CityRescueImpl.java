@@ -286,10 +286,29 @@ public class CityRescueImpl implements CityRescue {
         station.removeUnit(unitId);
     }
 
+    /**
+     * Moves a unit to a new station as long as it is idle.
+     * 
+     * @param unitId       the ID of the unit to be moved
+     * @param newStationId the ID of the station the unit is to be moved to
+     * @throws IDNotRecognisedException if no unit or station exists with the given
+     *                                  unitId
+     * @throws IllegalStateException    if the given unit is not idle or the new
+     *                                  station does not have space
+     */
     @Override
     public void transferUnit(int unitId, int newStationId) throws IDNotRecognisedException, IllegalStateException {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        Unit unit = getUnit(unitId);
+        Station station = getStation(newStationId);
+        // Guard clause to check if unit is idle
+        if (unit.status != UnitStatus.IDLE) {
+            throw new IllegalStateException("A unit must be idle for it to be transferred");
+        }
+
+        station.removeUnit(unitId);
+        station.addUnit(unit);
+        unit.x = station.x;
+        unit.y = station.y;
     }
 
     /**
