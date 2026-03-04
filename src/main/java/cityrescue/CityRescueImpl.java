@@ -17,6 +17,7 @@ public class CityRescueImpl implements CityRescue {
     int incidentsCounter = 0;
     // ID Counters (used to generate new ids)
     int stationIdCounter = 0;
+    int unitIdCounter = 0;
 
     /**
      * Initialises the CityRescue class by resetting state variables to their
@@ -94,6 +95,8 @@ public class CityRescueImpl implements CityRescue {
         }
 
         Station station = new Station(++stationIdCounter, name, x, y);
+        // TODO: Try to move this to a generic method since it is used a lot. It needs
+        // to be able to take multiple different object types.
         for (int i = 0; i < stations.length; i++) {
             if (stations[i] == null) {
                 stations[i] = station;
@@ -154,13 +157,7 @@ public class CityRescueImpl implements CityRescue {
             throws IDNotRecognisedException, InvalidCapacityException {
         // Use utility function to find station
         Station station = getStation(stationId);
-        // Guard clauses to check if capacity is valid
-        if (maxUnits <= 0) {
-            throw new InvalidCapacityException("Given station capacity must be greater than zero");
-        }
-        // TODO: Add guard clause to check if current number of units is less than new
-        // capacity
-        station.capacity = maxUnits;
+        station.setCapacity(maxUnits);
     }
 
     // Private utility function since functionality is used in multiple methods
@@ -180,6 +177,23 @@ public class CityRescueImpl implements CityRescue {
         return station;
     }
 
+    // Private utility function since functionality is used in multiple methods
+    private Unit getUnit(int unitId) throws IDNotRecognisedException {
+        // Search for a unit with the given ID
+        Unit unit = null;
+        for (int i = 0; i < units.length; i++) {
+            if (units[i].unitId == unitId) {
+                unit = units[i];
+                break;
+            }
+        }
+        // Guard clause to check if station exists
+        if (unit == null) {
+            throw new IDNotRecognisedException("Unit with given unitId does not exist");
+        }
+        return unit;
+    }
+
     /**
      * Provides a list of all current station IDs.
      * 
@@ -197,17 +211,98 @@ public class CityRescueImpl implements CityRescue {
         return stationIds;
     }
 
+    /**
+     * Creates a new unit and adds it to the simulation.
+     * 
+     * @param stationId the ID of the unit's assigned station
+     * @param type      the UnitType enum of the unit
+     * @return the unitId of the new unit
+     * @throws IDNotRecognisedException if the ID of the unit's assigned station can
+     *                                  not be found
+     * @throws InvalidUnitException     if an invalid/null unit type is given
+     * @throws IllegalStateException    if the unit's assigned station has no free
+     *                                  capacity
+     */
     @Override
     public int addUnit(int stationId, UnitType type)
             throws IDNotRecognisedException, InvalidUnitException, IllegalStateException {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        Station station = getStation(stationId);
+        // TODO: Guard clause to check if station has free capacity
+        // TODO: Check if unit type is not null
+        // TODO: Handle creating different unit subclasses based on type parameter
+
+        Unit unit = new Unit(++unitIdCounter, station.stationId, station.x, station.y);
+        // Add unit to units list
+        for (int i = 0; i < units.length; i++) {
+            if (units[i] == null) {
+                units[i] = unit;
+                unitsCounter += 1;
+                break;
+            }
+        }
+
+        // Add unit to selected station
+        for (int i = 0; i < station.units.length; i++) {
+            if (station.units[i] == null) {
+                station.units[i] = unit;
+                station.unitsCounter += 1;
+                break;
+            }
+        }
+
+        return unit.unitId;
     }
 
+    /**
+     * Removes a given unit from the simulation as long as it is not busy.
+     * 
+     * @param unitId the ID of the unit to be deleted
+     * @throws IDNotRecognisedException if no unit exists with the given unitId
+     * @throws IllegalStateException    if the unit is not free (enroute or at
+     *                                  scene)
+     */
     @Override
     public void decommissionUnit(int unitId) throws IDNotRecognisedException, IllegalStateException {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        // Search for a unit with the given ID
+        Unit unit = null;
+        int unitIndex = 0;
+        for (int i = 0; i < units.length; i++) {
+            if (units[i].unitId == unitId) {
+                unit = units[i];
+                unitIndex = i;
+                break;
+            }
+        }
+        // Guard clause to check if unit exists
+        if (unit == null) {
+            throw new IDNotRecognisedException("Station with given stationId does not exist");
+        }
+        // Guard clause to check if unit is not busy
+        if (unit.status == UnitStatus.EN_ROUTE || unit.status == UnitStatus.AT_SCENE) {
+            throw new IllegalStateException("The unit is not free (enroute or at scene)");
+        }
+
+        // Get unit's assigned station
+        Station station = getStation(unit.stationId);
+
+        // Remove from global units list
+        units[unitIndex] = null;
+        unitsCounter--;
+
+        // Search for a unit with the given ID in station's unit list
+        unit = null;
+        unitIndex = 0;
+        for (int i = 0; i < station.units.length; i++) {
+            if (station.units[i].unitId == unitId) {
+                unit = station.units[i];
+                unitIndex = i;
+                break;
+            }
+        }
+
+        // Remove from station's units list
+        station.units[unitIndex] = null;
+        station.unitsCounter--;
     }
 
     @Override
@@ -216,23 +311,73 @@ public class CityRescueImpl implements CityRescue {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
+    /**
+     * Either sets a given unit to the idle status or puts it out of service if
+     * outOfService is true. A unit can only be set as out of service if it is
+     * already idle.
+     * 
+     * @param unitId       the ID of the unit to be updated
+     * @param outOfService this will set the unit to out of service rather than idle
+     *                     if true
+     * @throws IDNotRecognisedException if no unit exists with the given unitId
+     * @throws IllegalStateException    if an attempt is made to put a unit out of
+     *                                  service when it is not idle
+     */
     @Override
     public void setUnitOutOfService(int unitId, boolean outOfService)
             throws IDNotRecognisedException, IllegalStateException {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        Unit unit = getUnit(unitId);
+        // Guard clause
+        if (outOfService && unit.status != UnitStatus.IDLE) {
+            throw new IllegalStateException("A unit must be idle for it to be put out of service");
+        }
+
+        if (outOfService) {
+            unit.status = UnitStatus.OUT_OF_SERVICE;
+        }
+        if (!outOfService) {
+            unit.status = UnitStatus.IDLE;
+        }
+
     }
 
+    /**
+     * Provides a list of all current unit IDs.
+     * 
+     * @return a list of units IDs sorted in ascending order
+     */
     @Override
     public int[] getUnitIds() {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        int[] unitIds = new int[unitsCounter];
+        int unitIdsCounter = 0;
+        for (Unit unit : units) {
+            unitIds[unitIdsCounter] = unit.unitId;
+            unitIdsCounter++;
+        }
+        Arrays.sort(unitIds);
+        return unitIds;
     }
 
+    /**
+     * Returns a formatted string containing information about the given unit.
+     * 
+     * @param unitId the ID of the unit to be updated
+     * @return a formatted string describing the unit
+     * @throws IDNotRecognisedException if no unit exists with the given unitId
+     */
     @Override
     public String viewUnit(int unitId) throws IDNotRecognisedException {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        Unit unit = getUnit(unitId);
+        // TODO: Output unit type (when subclasses implemented)
+        // TODO: Output current unit incident (when implemented)
+        String status = String.format("U#%d TYPE=%s HOME=%d LOC=(%d,%d) STATUS=%s INCIDENT=%d", unit.unitId,
+                "NOT IMPLEMENTED", unit.stationId, unit.x, unit.y, unit.status, "NOT IMPLEMENTED");
+        // TODO: Implement 'work' property when incidents are added
+        // if (condition) {
+        // status += String.format(" WORK=%d", "NOT IMPLEMENTED");
+        // }
+
+        return status;
     }
 
     @Override
@@ -288,8 +433,15 @@ public class CityRescueImpl implements CityRescue {
                 incidentsCounter, map.obstaclesCounter);
         status += "\nINCIDENTS";
         // TODO: Implement listing of incidents
+        // List all units
         status += "\nUNITS";
-        // TODO: Implement listing of units
+        for (int unitId : getUnitIds()) {
+            try {
+                status += ("\n" + viewUnit(unitId));
+            } catch (IDNotRecognisedException e) {
+                System.out.println(String.format("U#%d UNIT NOT FOUND", unitId));
+            }
+        }
 
         return status;
     }
