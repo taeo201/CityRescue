@@ -12,7 +12,8 @@ public class Station {
 
     Unit[] units = new Unit[0];
     int unitsCounter = 0;
-    int capacity;
+    int capacity = 6; // Default station capacity (arbitrary because not given in spec but required
+                      // for tests)
 
     public Station(int stationId, String name, int x, int y) {
         this.stationId = stationId;
