@@ -1,10 +1,12 @@
 package cityrescue;
 
 import cityrescue.enums.UnitStatus;
+import cityrescue.enums.UnitType;
 
 public class Unit {
     int unitId;
     int stationId;
+    UnitType type;
     UnitStatus status = UnitStatus.IDLE;
     int x;
     int y;
@@ -16,5 +18,3 @@ public class Unit {
         this.y = y;
     }
 }
-
-// TODO: Make additional unit subclasses (Ambulance, FireEngine, PoliceCar)

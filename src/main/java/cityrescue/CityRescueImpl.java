@@ -227,10 +227,22 @@ public class CityRescueImpl implements CityRescue {
     public int addUnit(int stationId, UnitType type)
             throws IDNotRecognisedException, InvalidUnitException, IllegalStateException {
         Station station = getStation(stationId);
-        // TODO: Check if unit type is not null
-        // TODO: Handle creating different unit subclasses based on type parameter
+        // Create the appropriate subclass type based on specified unit type
+        Unit unit;
+        switch (type) {
+            case AMBULANCE:
+                unit = new Ambulance(++unitIdCounter, station.stationId, station.x, station.y);
+                break;
+            case FIRE_ENGINE:
+                unit = new FireEngine(++unitIdCounter, station.stationId, station.x, station.y);
+                break;
+            case POLICE_CAR:
+                unit = new PoliceCar(++unitIdCounter, station.stationId, station.x, station.y);
+                break;
+            default:
+                throw new IllegalStateException("Invalid unit type given");
+        }
 
-        Unit unit = new Unit(++unitIdCounter, station.stationId, station.x, station.y);
         // Add unit to units list
         for (int i = 0; i < units.length; i++) {
             if (units[i] == null) {
@@ -371,10 +383,9 @@ public class CityRescueImpl implements CityRescue {
     @Override
     public String viewUnit(int unitId) throws IDNotRecognisedException {
         Unit unit = getUnit(unitId);
-        // TODO: Output unit type (when subclasses implemented)
         // TODO: Output current unit incident (when implemented)
         String status = String.format("U#%d TYPE=%s HOME=%d LOC=(%d,%d) STATUS=%s INCIDENT=%d", unit.unitId,
-                "NOT IMPLEMENTED", unit.stationId, unit.x, unit.y, unit.status, "NOT IMPLEMENTED");
+                unit.type, unit.stationId, unit.x, unit.y, unit.status, "NOT IMPLEMENTED");
         // TODO: Implement 'work' property when incidents are added
         // if (condition) {
         // status += String.format(" WORK=%d", "NOT IMPLEMENTED");
