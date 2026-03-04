@@ -351,6 +351,9 @@ public class CityRescueImpl implements CityRescue {
         int[] unitIds = new int[unitsCounter];
         int unitIdsCounter = 0;
         for (Unit unit : units) {
+            if (unit == null) {
+                continue;
+            }
             unitIds[unitIdsCounter] = unit.unitId;
             unitIdsCounter++;
         }
