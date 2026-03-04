@@ -33,4 +33,30 @@ public class Station {
         System.out.println(units.length);
         this.capacity = maxUnits;
     }
+
+    public void addUnit(Unit unit) throws IllegalStateException {
+        if (unitsCounter >= capacity) {
+            throw new IllegalStateException("The station has no free space");
+        }
+
+        for (int i = 0; i < units.length; i++) {
+            if (units[i] == null) {
+                units[i] = unit;
+                unitsCounter += 1;
+                break;
+            }
+        }
+    }
+
+    public void removeUnit(int unitId) {
+        int unitIndex = 0;
+        for (int i = 0; i < units.length; i++) {
+            if (units[i].unitId == unitId) {
+                unitIndex = i;
+                break;
+            }
+        }
+        units[unitIndex] = null;
+        unitsCounter--;
+    }
 }

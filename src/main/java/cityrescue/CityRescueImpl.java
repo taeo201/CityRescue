@@ -227,7 +227,6 @@ public class CityRescueImpl implements CityRescue {
     public int addUnit(int stationId, UnitType type)
             throws IDNotRecognisedException, InvalidUnitException, IllegalStateException {
         Station station = getStation(stationId);
-        // TODO: Guard clause to check if station has free capacity
         // TODO: Check if unit type is not null
         // TODO: Handle creating different unit subclasses based on type parameter
 
@@ -242,13 +241,7 @@ public class CityRescueImpl implements CityRescue {
         }
 
         // Add unit to selected station
-        for (int i = 0; i < station.units.length; i++) {
-            if (station.units[i] == null) {
-                station.units[i] = unit;
-                station.unitsCounter += 1;
-                break;
-            }
-        }
+        station.addUnit(unit);
 
         return unit.unitId;
     }
@@ -289,20 +282,8 @@ public class CityRescueImpl implements CityRescue {
         units[unitIndex] = null;
         unitsCounter--;
 
-        // Search for a unit with the given ID in station's unit list
-        unit = null;
-        unitIndex = 0;
-        for (int i = 0; i < station.units.length; i++) {
-            if (station.units[i].unitId == unitId) {
-                unit = station.units[i];
-                unitIndex = i;
-                break;
-            }
-        }
-
-        // Remove from station's units list
-        station.units[unitIndex] = null;
-        station.unitsCounter--;
+        // Remove from station units list
+        station.removeUnit(unitId);
     }
 
     @Override
