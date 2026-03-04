@@ -86,13 +86,8 @@ public class CityRescueImpl implements CityRescue {
         if (name == "") {
             throw new InvalidNameException("Name must not be an empty string");
         }
-        try {
-            if (map.obstacles[x][y]) {
-                throw new InvalidLocationException("This location is blocked by an obstacle");
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new InvalidLocationException("Location out of bounds");
-        }
+        // Automatically throws an exception if location invalid
+        checkValidLocation(x, y);
 
         Station station = new Station(++stationIdCounter, name, x, y);
         // TODO: Try to move this to a generic method since it is used a lot. It needs
@@ -105,6 +100,18 @@ public class CityRescueImpl implements CityRescue {
             }
         }
         return station.stationId;
+    }
+
+    // Private utility function since functionality used in multiple places
+    // throws an exception directly if location is invalid with appropriate message
+    private void checkValidLocation(int x, int y) throws InvalidLocationException {
+        try {
+            if (map.obstacles[x][y]) {
+                throw new InvalidLocationException("This location is blocked by an obstacle");
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new InvalidLocationException("Location out of bounds");
+        }
     }
 
     /**
