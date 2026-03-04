@@ -88,10 +88,10 @@ public class CityRescueImpl implements CityRescue {
         }
         try {
             if (map.obstacles[x][y]) {
-                throw new InvalidNameException("This location is blocked by an obstacle");
+                throw new InvalidLocationException("This location is blocked by an obstacle");
             }
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new InvalidNameException("Location out of bounds");
+            throw new InvalidLocationException("Location out of bounds");
         }
 
         Station station = new Station(++stationIdCounter, name, x, y);
