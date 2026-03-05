@@ -678,7 +678,7 @@ public class CityRescueImpl implements CityRescue {
                 Incident incident = getIncident(unit.incidentId);
                 if (incident == null)
                     continue;
-
+                unit.work++;
                 incident.ticksRemaining--;
             } catch (Exception e) {
                 throw new RuntimeException("Invalid incidentId for unknown reason");
