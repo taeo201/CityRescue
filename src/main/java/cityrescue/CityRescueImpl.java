@@ -351,7 +351,7 @@ public class CityRescueImpl implements CityRescue {
             throw new IllegalStateException("A unit must be idle for it to be transferred");
         }
 
-        station.removeUnit(unitId);
+        getStation(unit.stationId).removeUnit(unitId);
         station.addUnit(unit);
         unit.x = station.x;
         unit.y = station.y;
