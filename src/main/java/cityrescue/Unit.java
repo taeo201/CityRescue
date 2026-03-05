@@ -8,6 +8,8 @@ public class Unit {
     int stationId;
     UnitType type;
     UnitStatus status = UnitStatus.IDLE;
+    int incidentId = 0;
+    int work = 0;
     int x;
     int y;
 
@@ -16,5 +18,10 @@ public class Unit {
         this.stationId = stationId;
         this.x = x;
         this.y = y;
+    }
+
+    public void unassignIncident() {
+        incidentId = 0;
+        work = 0;
     }
 }
