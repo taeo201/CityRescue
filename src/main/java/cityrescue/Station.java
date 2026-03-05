@@ -1,7 +1,5 @@
 package cityrescue;
 
-import java.util.Arrays;
-
 import cityrescue.exceptions.InvalidCapacityException;
 
 public class Station {
