@@ -1,5 +1,6 @@
 package cityrescue;
 
+import cityrescue.enums.IncidentType;
 import cityrescue.enums.UnitStatus;
 import cityrescue.enums.UnitType;
 
@@ -26,6 +27,8 @@ public abstract class Unit {
     }
 
     public abstract int getTicksToResolve(int severity);
+
+    public abstract boolean canHandle(IncidentType type);
 
     public void moveTowards(int targetX, int targetY, CityMap map) {
         int[] dx = {  0, 1,  0, -1 };

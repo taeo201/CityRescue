@@ -568,18 +568,25 @@ public class CityRescueImpl implements CityRescue {
     @Override
     public void dispatch() {
         for (Incident incident : incidents) {
-            if (incident == null) continue;
-            if (incident.status != IncidentStatus.REPORTED) continue;
-            
+            if (incident == null)
+                continue;
+            if (incident.status != IncidentStatus.REPORTED)
+                continue;
+
             Unit bestUnit = null;
             int bestDist = Integer.MAX_VALUE;
 
             for (Unit unit : units) {
-                if (unit == null) continue;
-                if (unit.status == UnitStatus.OUT_OF_SERVICE) continue;
-                if (unit.status == UnitStatus.EN_ROUTE || unit.status == UnitStatus.AT_SCENE) continue;
-                if (unit.incidentId != 0) continue;
-                if (!unit.canHandle(incident.type)) continue;
+                if (unit == null)
+                    continue;
+                if (unit.status == UnitStatus.OUT_OF_SERVICE)
+                    continue;
+                if (unit.status == UnitStatus.EN_ROUTE || unit.status == UnitStatus.AT_SCENE)
+                    continue;
+                if (unit.incidentId != 0)
+                    continue;
+                if (!unit.canHandle(incident.type))
+                    continue;
 
                 int dist = Math.abs(unit.x - incident.x) + Math.abs(unit.y - incident.y);
 
@@ -611,49 +618,67 @@ public class CityRescueImpl implements CityRescue {
         }
     }
 
-    
-
     @Override
     public void tick() {
-        // TODO: implement
         tick++;
         for (int i = 0; i < units.length; i++) {
             Unit unit = units[i];
-            if (unit == null || unit.status != UnitStatus.EN_ROUTE) continue;
+            if (unit == null || unit.status != UnitStatus.EN_ROUTE)
+                continue;
 
-            Incident target = getIncidentById(unit.incidentId);
-            if (target == null) continue;    
-            unit.moveTowards(target.x, target.y, map);
-        }
-
-        for (int i = 0; i < units.length; i++) {
-            Unit unit = units[i];
-            if (unit == null || unit.status != UnitStatus.EN_ROUTE) continue;
-
-            Incident incident = getIncidentById(unit.incidentId);
-            if (incident == null) continue;
-
-            if (unit.x == incident.x && unit.y == incident.y) {
-                unit.status = UnitStatus.AT_SCENE;
-                incident.status = IncidentStatus.IN_PROGRESS;
-                incident.ticksRemaining = unit.getTicksToResolve(incident.severity);
+            try {
+                Incident target = getIncident(unit.incidentId);
+                if (target == null)
+                continue;
+                unit.moveTowards(target.x, target.y, map);
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid incidentId for unknown reason");
             }
         }
 
         for (int i = 0; i < units.length; i++) {
             Unit unit = units[i];
-            if (unit == null || unit.status != UnitStatus.AT_SCENE) continue;
+            if (unit == null || unit.status != UnitStatus.EN_ROUTE)
+                continue;
 
-            Incident incident = getIncidentById(unit.incidentId);
-            if (incident == null) continue;
+            try {
+                Incident incident = getIncident(unit.incidentId);
+                if (incident == null)
+                    continue;
 
-            incident.ticksRemaining--;
+                if (unit.x == incident.x && unit.y == incident.y) {
+                    unit.status = UnitStatus.AT_SCENE;
+                    incident.status = IncidentStatus.IN_PROGRESS;
+                    incident.ticksRemaining = unit.getTicksToResolve(incident.severity);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid incidentId for unknown reason");
+            }
+        }
+
+        for (int i = 0; i < units.length; i++) {
+            Unit unit = units[i];
+            if (unit == null || unit.status != UnitStatus.AT_SCENE)
+                continue;
+
+            try {
+                Incident incident = getIncident(unit.incidentId);
+                if (incident == null)
+                    continue;
+
+                incident.ticksRemaining--;
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid incidentId for unknown reason");
+            }
         }
 
         for (Incident incident : incidents) {
-            if (incident == null) continue;
-            if (incident.status != IncidentStatus.IN_PROGRESS) continue;
-            if (incident.ticksRemaining > 0) continue;
+            if (incident == null)
+                continue;
+            if (incident.status != IncidentStatus.IN_PROGRESS)
+                continue;
+            if (incident.ticksRemaining > 0)
+                continue;
 
             incident.status = IncidentStatus.RESOLVED;
             try {
