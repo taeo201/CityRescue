@@ -89,6 +89,9 @@ public class CityRescueImpl implements CityRescue {
         if (name.isEmpty()) {
             throw new InvalidNameException("Name must not be an empty string");
         }
+        if (stationsCounter >= 20) {
+            throw new CapacityExceededException("Maximum number of stations reached");
+        }
         // Automatically throws an exception if location invalid
         checkValidLocation(x, y);
 
@@ -261,6 +264,10 @@ public class CityRescueImpl implements CityRescue {
     public int addUnit(int stationId, UnitType type)
             throws IDNotRecognisedException, InvalidUnitException, IllegalStateException {
         Station station = getStation(stationId);
+        // Guard clause to check array is not full
+        if (unitsCounter >= 50) {
+            throw new CapacityExceededException("Maximum number of units reached");
+        }
         // Create the appropriate subclass type based on specified unit type
         Unit unit;
         switch (type) {
@@ -456,6 +463,9 @@ public class CityRescueImpl implements CityRescue {
         }
         if (severity < 1 || severity > 5) {
             throw new InvalidSeverityException("Invalid severity. Severity must be >= 1 and <= 5");
+        }
+        if (incidentsCounter >= 20) {
+            throw new CapacityExceededException("Maximum number of incidents reached");
         }
         checkValidLocation(x, y);
 
