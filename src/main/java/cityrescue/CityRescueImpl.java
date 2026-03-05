@@ -133,6 +133,9 @@ public class CityRescueImpl implements CityRescue {
         Station station = null;
         int stationIndex = 0;
         for (int i = 0; i < stations.length; i++) {
+            if (stations[i] == null) {
+                continue;
+            }
             if (stations[i].stationId == stationId) {
                 station = stations[i];
                 stationIndex = i;
@@ -177,7 +180,7 @@ public class CityRescueImpl implements CityRescue {
         // Search for a station with the given ID
         Station station = null;
         for (int i = 0; i < stations.length; i++) {
-            if (stations[i].stationId == stationId) {
+            if (stations[i] != null && stations[i].stationId == stationId) {
                 station = stations[i];
                 break;
             }
@@ -194,7 +197,7 @@ public class CityRescueImpl implements CityRescue {
         // Search for a unit with the given ID
         Unit unit = null;
         for (int i = 0; i < units.length; i++) {
-            if (units[i].unitId == unitId) {
+            if (units[i] != null && units[i].unitId == unitId) {
                 unit = units[i];
                 break;
             }
@@ -211,7 +214,7 @@ public class CityRescueImpl implements CityRescue {
         // Search for an incident with the given ID
         Incident incident = null;
         for (int i = 0; i < incidents.length; i++) {
-            if (incidents[i].incidentId == incidentId) {
+            if (incidents[i] != null && incidents[i].incidentId == incidentId) {
                 incident = incidents[i];
                 break;
             }
@@ -304,7 +307,7 @@ public class CityRescueImpl implements CityRescue {
         Unit unit = null;
         int unitIndex = 0;
         for (int i = 0; i < units.length; i++) {
-            if (units[i].unitId == unitId) {
+            if (units[i] != null && units[i].unitId == unitId) {
                 unit = units[i];
                 unitIndex = i;
                 break;
