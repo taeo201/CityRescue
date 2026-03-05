@@ -315,7 +315,7 @@ public class CityRescueImpl implements CityRescue {
         }
         // Guard clause to check if unit exists
         if (unit == null) {
-            throw new IDNotRecognisedException("Station with given stationId does not exist");
+            throw new IDNotRecognisedException("Unit with given unitId does not exist");
         }
         // Guard clause to check if unit is not busy
         if (unit.status == UnitStatus.EN_ROUTE || unit.status == UnitStatus.AT_SCENE) {
@@ -433,7 +433,6 @@ public class CityRescueImpl implements CityRescue {
         if (unit.work > 0 && unit.incidentId != 0) {
             status += String.format(" WORK=%d", unit.work);
         }
-        System.out.println(status);
         return status;
     }
 
@@ -628,11 +627,12 @@ public class CityRescueImpl implements CityRescue {
     }
 
     /**
-     * Advances the simulation time by one tick. Increases the tick value by one and then:
-     *  - Moves EN_ROUTE units towards incidents
-     *  - Detects when units have arrived at incidents
-     *  - Processes the work ticks of each on-scene unit
-     *  - Detects completed incidents
+     * Advances the simulation time by one tick. Increases the tick value by one and
+     * then:
+     * - Moves EN_ROUTE units towards incidents
+     * - Detects when units have arrived at incidents
+     * - Processes the work ticks of each on-scene unit
+     * - Detects completed incidents
      */
     @Override
     public void tick() {
