@@ -93,8 +93,6 @@ public class CityRescueImpl implements CityRescue {
         checkValidLocation(x, y);
 
         Station station = new Station(++stationIdCounter, name, x, y);
-        // TODO: Try to move this to a generic method since it is used a lot. It needs
-        // to be able to take multiple different object types.
         for (int i = 0; i < stations.length; i++) {
             if (stations[i] == null) {
                 stations[i] = station;
