@@ -441,7 +441,7 @@ public class CityRescueImpl implements CityRescue {
                 if (unit == null) continue;
                 if (unit.status == UnitStatus.OUT_OF_SERVICE) continue;
                 if (unit.status == UnitStatus.EN_ROUTE || unit.status == UnitStatus.AT_SCENE) continue;
-                if (unit.incidentId != -1) continue;
+                if (unit.incidentId != 0) continue;
                 if (!unit.canHandle(incident.type)) continue;
 
                 int dist = Math.abs(unit.x - incident.x) + Math.abs(unit.y - incident.y);
@@ -522,11 +522,11 @@ public class CityRescueImpl implements CityRescue {
             try {
                 Unit unit = getUnit(incident.unitId);
                 unit.status = UnitStatus.IDLE;
-                unit.assignedIncidentId = -1;
+                unit.assignedIncidentId = 0;
             } catch (IDNotRecognisedException e) {
                 // should not happen in normal flow
             }
-            incident.unitId = -1;
+            incident.unitId = 0;
         }
         // throw new UnsupportedOperationException("Not implemented yet");
     }

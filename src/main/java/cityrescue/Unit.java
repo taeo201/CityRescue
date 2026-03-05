@@ -8,7 +8,7 @@ public abstract class Unit {
     int stationId;
     UnitType type;
     UnitStatus status = UnitStatus.IDLE;
-    int incidentId = -1;
+    int incidentId = 0;
     int work = 0;
     int x;
     int y;
