@@ -522,7 +522,7 @@ public class CityRescueImpl implements CityRescue {
             try {
                 Unit unit = getUnit(incident.unitId);
                 unit.status = UnitStatus.IDLE;
-                unit.assignedIncidentId = 0;
+                unit.incidentId = 0;
             } catch (IDNotRecognisedException e) {
                 // should not happen in normal flow
             }
