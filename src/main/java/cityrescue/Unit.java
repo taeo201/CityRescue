@@ -22,6 +22,7 @@ public abstract class Unit {
     }
 
     public void unassignIncident() {
+        status = UnitStatus.IDLE;
         incidentId = 0;
         work = 0;
     }
