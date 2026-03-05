@@ -19,4 +19,9 @@ public class Unit {
         this.x = x;
         this.y = y;
     }
+
+    public void unassignIncident() {
+        incidentId = 0;
+        work = 0;
+    }
 }

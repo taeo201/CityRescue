@@ -427,7 +427,7 @@ public class CityRescueImpl implements CityRescue {
                 break;
         }
 
-        if (unit.work > 0) {
+        if (unit.work > 0 && unit.incidentId != 0) {
             status += String.format(" WORK=%d", unit.work);
         }
         System.out.println(status);
@@ -490,7 +490,7 @@ public class CityRescueImpl implements CityRescue {
         }
 
         if (incident.status == IncidentStatus.DISPATCHED) {
-            getUnit(incident.unitId).incidentId = 0;
+            getUnit(incident.unitId).unassignIncident();
         }
         incident.status = IncidentStatus.CANCELLED;
     }
