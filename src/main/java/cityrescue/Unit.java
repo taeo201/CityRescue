@@ -20,10 +20,6 @@ public abstract class Unit {
         this.y = y;
     }
 
-    public void unassignIncident() {
-        incidentId = 0;
-        work = 0;
-      
     public abstract int getTicksToResolve(int severity);
 
     public void moveTowards(int targetX, int targetY, CityMap map) {
