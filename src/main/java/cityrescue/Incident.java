@@ -7,6 +7,7 @@ public class Incident {
     int incidentId;
     IncidentType type;
     IncidentStatus status;
+    int ticksRemaining;
     int severity;
     int unitId;
     int x;

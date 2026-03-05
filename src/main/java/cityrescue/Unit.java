@@ -1,9 +1,10 @@
 package cityrescue;
 
+import cityrescue.enums.IncidentType;
 import cityrescue.enums.UnitStatus;
 import cityrescue.enums.UnitType;
 
-public class Unit {
+public abstract class Unit {
     int unitId;
     int stationId;
     UnitType type;
@@ -21,7 +22,35 @@ public class Unit {
     }
 
     public void unassignIncident() {
+        status = UnitStatus.IDLE;
         incidentId = 0;
         work = 0;
+    }
+
+    public abstract int getTicksToResolve(int severity);
+
+    public abstract boolean canHandle(IncidentType type);
+
+    public void moveTowards(int targetX, int targetY, CityMap map) {
+        int[] dx = {  0, 1,  0, -1 };
+        int[] dy = { -1, 0,  1,  0 };
+        int currentDist = Math.abs(x - targetX) + Math.abs(y - targetY);
+
+        for (int i = 0; i < 4; i++) {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+            if (map.checkMoveIsLegal(nx, ny)) {
+                if (Math.abs(nx - targetX) + Math.abs(ny - targetY) < currentDist) {
+                    x = nx; y = ny; return;
+                }
+            }
+        }
+        for (int i = 0; i < 4; i++) {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+            if (map.checkMoveIsLegal(nx, ny)) {
+                x = nx; y = ny; return;
+            }
+        }
     }
 }
