@@ -153,6 +153,7 @@ public class CityRescueImpl implements CityRescue {
 
         // Delete station
         stations[stationIndex] = null;
+        stationsCounter--;
     }
 
     /**
