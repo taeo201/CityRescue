@@ -703,7 +703,6 @@ public class CityRescueImpl implements CityRescue {
             }
             incident.unitId = 0;
         }
-        // throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
