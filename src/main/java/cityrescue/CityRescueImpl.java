@@ -565,6 +565,12 @@ public class CityRescueImpl implements CityRescue {
         return status;
     }
 
+    /**
+     * Assigns valid units to waiting incidents (incidents with a
+     * REPORTED status) and updates their status. Uses tie-breakers to determine how
+     * to assign incidents deterministically. Then updates the incident's and unit's
+     * status
+     */
     @Override
     public void dispatch() {
         for (Incident incident : incidents) {
@@ -618,6 +624,13 @@ public class CityRescueImpl implements CityRescue {
         }
     }
 
+    /**
+     * Advances the simulation time by one tick. Increases the tick value by one and then:
+     *  - Moves EN_ROUTE units towards incidents
+     *  - Detects when units have arrived at incidents
+     *  - Processes the work ticks of each on-scene unit
+     *  - Detects completed incidents
+     */
     @Override
     public void tick() {
         tick++;
@@ -629,7 +642,7 @@ public class CityRescueImpl implements CityRescue {
             try {
                 Incident target = getIncident(unit.incidentId);
                 if (target == null)
-                continue;
+                    continue;
                 unit.moveTowards(target.x, target.y, map);
             } catch (Exception e) {
                 throw new RuntimeException("Invalid incidentId for unknown reason");
