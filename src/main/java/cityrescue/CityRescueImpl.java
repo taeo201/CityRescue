@@ -429,7 +429,7 @@ public class CityRescueImpl implements CityRescue {
                 break;
         }
 
-        if (unit.work > 0 && unit.incidentId != 0) {
+        if (unit.work > 0 && unit.status == UnitStatus.AT_SCENE) {
             status += String.format(" WORK=%d", unit.work);
         }
         return status;
