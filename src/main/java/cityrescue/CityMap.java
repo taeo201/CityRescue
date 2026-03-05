@@ -33,8 +33,6 @@ public class CityMap {
     }
 
     public boolean checkMoveIsLegal(int x, int y) {
-        // TODO: Implement checkMoveIsLegal
-        // throw new UnsupportedOperationException("Not implemented yet");
         if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight) return false;
         return !obstacles[x][y];
     }
