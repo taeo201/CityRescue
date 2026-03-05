@@ -274,7 +274,7 @@ public class CityRescueImpl implements CityRescue {
                 unit = new PoliceCar(++unitIdCounter, station.stationId, station.x, station.y);
                 break;
             default:
-                throw new IllegalStateException("Invalid unit type given");
+                throw new InvalidUnitException("Invalid unit type given");
         }
 
         // Add unit to units list
