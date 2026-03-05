@@ -567,14 +567,105 @@ public class CityRescueImpl implements CityRescue {
 
     @Override
     public void dispatch() {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (Incident incident : incidents) {
+            if (incident == null) continue;
+            if (incident.status != IncidentStatus.REPORTED) continue;
+            
+            Unit bestUnit = null;
+            int bestDist = Integer.MAX_VALUE;
+
+            for (Unit unit : units) {
+                if (unit == null) continue;
+                if (unit.status == UnitStatus.OUT_OF_SERVICE) continue;
+                if (unit.status == UnitStatus.EN_ROUTE || unit.status == UnitStatus.AT_SCENE) continue;
+                if (unit.incidentId != 0) continue;
+                if (!unit.canHandle(incident.type)) continue;
+
+                int dist = Math.abs(unit.x - incident.x) + Math.abs(unit.y - incident.y);
+
+                boolean better = false;
+                if (dist < bestDist) {
+                    better = true;
+                } else if (dist == bestDist) {
+                    if (unit.unitId < bestUnit.unitId) {
+                        better = true;
+                    } else if (unit.unitId == bestUnit.unitId) {
+                        if (unit.stationId < bestUnit.stationId) {
+                            better = true;
+                        }
+                    }
+                }
+
+                if (better) {
+                    bestUnit = unit;
+                    bestDist = dist;
+                }
+            }
+
+            if (bestUnit != null) {
+                bestUnit.status = UnitStatus.EN_ROUTE;
+                bestUnit.incidentId = incident.incidentId;
+                incident.status = IncidentStatus.DISPATCHED;
+                incident.unitId = bestUnit.unitId;
+            }
+        }
     }
+
+    
 
     @Override
     public void tick() {
         // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        tick++;
+        for (int i = 0; i < units.length; i++) {
+            Unit unit = units[i];
+            if (unit == null || unit.status != UnitStatus.EN_ROUTE) continue;
+
+            Incident target = getIncidentById(unit.incidentId);
+            if (target == null) continue;    
+            unit.moveTowards(target.x, target.y, map);
+        }
+
+        for (int i = 0; i < units.length; i++) {
+            Unit unit = units[i];
+            if (unit == null || unit.status != UnitStatus.EN_ROUTE) continue;
+
+            Incident incident = getIncidentById(unit.incidentId);
+            if (incident == null) continue;
+
+            if (unit.x == incident.x && unit.y == incident.y) {
+                unit.status = UnitStatus.AT_SCENE;
+                incident.status = IncidentStatus.IN_PROGRESS;
+                incident.ticksRemaining = unit.getTicksToResolve(incident.severity);
+            }
+        }
+
+        for (int i = 0; i < units.length; i++) {
+            Unit unit = units[i];
+            if (unit == null || unit.status != UnitStatus.AT_SCENE) continue;
+
+            Incident incident = getIncidentById(unit.incidentId);
+            if (incident == null) continue;
+
+            incident.ticksRemaining--;
+        }
+
+        for (Incident incident : incidents) {
+            if (incident == null) continue;
+            if (incident.status != IncidentStatus.IN_PROGRESS) continue;
+            if (incident.ticksRemaining > 0) continue;
+
+            incident.status = IncidentStatus.RESOLVED;
+            try {
+                Unit unit = getUnit(incident.unitId);
+                unit.status = UnitStatus.IDLE;
+                unit.incidentId = 0;
+            } catch (IDNotRecognisedException e) {
+                // should not happen in normal flow
+            }
+            incident.unitId = 0;
+        }
+        // throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
