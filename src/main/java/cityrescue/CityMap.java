@@ -27,10 +27,10 @@ public class CityMap {
 
     public void removeObstacle(int x, int y) throws InvalidLocationException {
         try {
-            obstacles[x][y] = false;
             if (obstacles[x][y]) {
                 obstaclesCounter--;
             }
+            obstacles[x][y] = false;
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new InvalidLocationException("Location out of bounds");
         }
