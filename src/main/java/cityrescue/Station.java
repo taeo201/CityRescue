@@ -10,10 +10,10 @@ public class Station {
     int x;
     int y;
 
-    Unit[] units = new Unit[0];
-    int unitsCounter = 0;
     int capacity = 6; // Default station capacity (arbitrary because not given in spec but required
                       // for tests)
+    Unit[] units = new Unit[capacity];
+    int unitsCounter = 0;
 
     public Station(int stationId, String name, int x, int y) {
         this.stationId = stationId;
@@ -52,7 +52,7 @@ public class Station {
     public void removeUnit(int unitId) {
         int unitIndex = 0;
         for (int i = 0; i < units.length; i++) {
-            if (units[i].unitId == unitId) {
+            if (units[i] != null && units[i].unitId == unitId) {
                 unitIndex = i;
                 break;
             }
