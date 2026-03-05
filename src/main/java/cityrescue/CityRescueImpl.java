@@ -86,7 +86,7 @@ public class CityRescueImpl implements CityRescue {
     @Override
     public int addStation(String name, int x, int y) throws InvalidNameException, InvalidLocationException {
         // Guard clauses to check preconditions
-        if (name == "") {
+        if (name.isEmpty()) {
             throw new InvalidNameException("Name must not be an empty string");
         }
         // Automatically throws an exception if location invalid
