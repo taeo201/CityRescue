@@ -415,14 +415,22 @@ public class CityRescueImpl implements CityRescue {
     @Override
     public String viewUnit(int unitId) throws IDNotRecognisedException {
         Unit unit = getUnit(unitId);
-        // TODO: Output current unit incident (when implemented)
-        String status = String.format("U#%d TYPE=%s HOME=%d LOC=(%d,%d) STATUS=%s INCIDENT=%d", unit.unitId,
-                unit.type, unit.stationId, unit.x, unit.y, unit.status, 0);
-        // TODO: Implement 'work' property when incidents are added
-        // if (condition) {
-        // status += String.format(" WORK=%d", "NOT IMPLEMENTED");
-        // }
+        String status = String.format("U#%d TYPE=%s HOME=%d LOC=(%d,%d) STATUS=%s", unit.unitId,
+                unit.type, unit.stationId, unit.x, unit.y, unit.status);
+        switch (unit.incidentId) {
+            case 0:
+                status += " INCIDENT=-";
+                break;
 
+            default:
+                status += String.format(" INCIDENT=%d", unit.incidentId);
+                break;
+        }
+
+        if (unit.work > 0) {
+            status += String.format(" WORK=%d", unit.work);
+        }
+        System.out.println(status);
         return status;
     }
 
@@ -543,9 +551,17 @@ public class CityRescueImpl implements CityRescue {
     @Override
     public String viewIncident(int incidentId) throws IDNotRecognisedException {
         Incident incident = getIncident(incidentId);
-        // TODO: Output unit number (when implemented)
-        String status = String.format("I#%d TYPE=%s SEV=%d LOC=(%d,%d) STATUS=%s UNIT=%d", incident.incidentId,
-                incident.type, incident.severity, incident.x, incident.y, incident.status, 0);
+        String status = String.format("I#%d TYPE=%s SEV=%d LOC=(%d,%d) STATUS=%s", incident.incidentId,
+                incident.type, incident.severity, incident.x, incident.y, incident.status);
+        switch (incident.unitId) {
+            case 0:
+                status += " UNIT=-";
+                break;
+
+            default:
+                status += String.format(" UNIT=%d", incident.unitId);
+                break;
+        }
         return status;
     }
 
