@@ -203,6 +203,23 @@ public class CityRescueImpl implements CityRescue {
         return unit;
     }
 
+    // Private utility function since functionality is used in multiple methods
+    private Incident getIncident(int incidentId) throws IDNotRecognisedException {
+        // Search for an incident with the given ID
+        Incident incident = null;
+        for (int i = 0; i < incidents.length; i++) {
+            if (incidents[i].incidentId == incidentId) {
+                incident = incidents[i];
+                break;
+            }
+        }
+        // Guard clause to check if station exists
+        if (incident == null) {
+            throw new IDNotRecognisedException("Incident with given incidentId does not exist");
+        }
+        return incident;
+    }
+
     /**
      * Provides a list of all current station IDs.
      * 
