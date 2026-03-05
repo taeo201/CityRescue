@@ -27,11 +27,18 @@ public class Station {
         if (maxUnits <= 0) {
             throw new InvalidCapacityException("Given station capacity must be greater than zero");
         }
-        // TODO: Add guard clause to check if current number of units is less than new
-        // capacity
-        // TODO: Proper way to shrink array if there are free spaces from removed items
-        units = Arrays.copyOf(units, maxUnits);
-        System.out.println(units.length);
+        if (maxUnits < unitsCounter) {
+            throw new InvalidCapacityException(
+                    "Given station capacity is lower than the number of units currently assigned to this station");
+        }
+
+        Unit[] unitsResised = new Unit[maxUnits];
+        for (int i = 0, j = 0; i < units.length; i++) {
+            if (units[i] != null) {
+                unitsResised[j++] = units[i];
+            }
+        }
+        this.units = unitsResised;
         this.capacity = maxUnits;
     }
 
