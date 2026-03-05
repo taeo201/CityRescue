@@ -277,6 +277,9 @@ public class CityRescueImpl implements CityRescue {
                 throw new InvalidUnitException("Invalid unit type given");
         }
 
+        // Add unit to selected station
+        station.addUnit(unit);
+
         // Add unit to units list
         for (int i = 0; i < units.length; i++) {
             if (units[i] == null) {
@@ -285,9 +288,6 @@ public class CityRescueImpl implements CityRescue {
                 break;
             }
         }
-
-        // Add unit to selected station
-        station.addUnit(unit);
 
         return unit.unitId;
     }
