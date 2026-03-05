@@ -86,15 +86,16 @@ public class CityRescueImpl implements CityRescue {
     @Override
     public int addStation(String name, int x, int y) throws InvalidNameException, InvalidLocationException {
         // Guard clauses to check preconditions
-        if (name == "") {
+        if (name.isEmpty()) {
             throw new InvalidNameException("Name must not be an empty string");
+        }
+        if (stationsCounter >= 20) {
+            throw new CapacityExceededException("Maximum number of stations reached");
         }
         // Automatically throws an exception if location invalid
         checkValidLocation(x, y);
 
         Station station = new Station(++stationIdCounter, name, x, y);
-        // TODO: Try to move this to a generic method since it is used a lot. It needs
-        // to be able to take multiple different object types.
         for (int i = 0; i < stations.length; i++) {
             if (stations[i] == null) {
                 stations[i] = station;
@@ -133,6 +134,9 @@ public class CityRescueImpl implements CityRescue {
         Station station = null;
         int stationIndex = 0;
         for (int i = 0; i < stations.length; i++) {
+            if (stations[i] == null) {
+                continue;
+            }
             if (stations[i].stationId == stationId) {
                 station = stations[i];
                 stationIndex = i;
@@ -150,6 +154,7 @@ public class CityRescueImpl implements CityRescue {
 
         // Delete station
         stations[stationIndex] = null;
+        stationsCounter--;
     }
 
     /**
@@ -177,7 +182,7 @@ public class CityRescueImpl implements CityRescue {
         // Search for a station with the given ID
         Station station = null;
         for (int i = 0; i < stations.length; i++) {
-            if (stations[i].stationId == stationId) {
+            if (stations[i] != null && stations[i].stationId == stationId) {
                 station = stations[i];
                 break;
             }
@@ -194,7 +199,7 @@ public class CityRescueImpl implements CityRescue {
         // Search for a unit with the given ID
         Unit unit = null;
         for (int i = 0; i < units.length; i++) {
-            if (units[i].unitId == unitId) {
+            if (units[i] != null && units[i].unitId == unitId) {
                 unit = units[i];
                 break;
             }
@@ -211,7 +216,7 @@ public class CityRescueImpl implements CityRescue {
         // Search for an incident with the given ID
         Incident incident = null;
         for (int i = 0; i < incidents.length; i++) {
-            if (incidents[i].incidentId == incidentId) {
+            if (incidents[i] != null && incidents[i].incidentId == incidentId) {
                 incident = incidents[i];
                 break;
             }
@@ -259,6 +264,10 @@ public class CityRescueImpl implements CityRescue {
     public int addUnit(int stationId, UnitType type)
             throws IDNotRecognisedException, InvalidUnitException, IllegalStateException {
         Station station = getStation(stationId);
+        // Guard clause to check array is not full
+        if (unitsCounter >= 50) {
+            throw new CapacityExceededException("Maximum number of units reached");
+        }
         // Create the appropriate subclass type based on specified unit type
         Unit unit;
         switch (type) {
@@ -272,8 +281,11 @@ public class CityRescueImpl implements CityRescue {
                 unit = new PoliceCar(++unitIdCounter, station.stationId, station.x, station.y);
                 break;
             default:
-                throw new IllegalStateException("Invalid unit type given");
+                throw new InvalidUnitException("Invalid unit type given");
         }
+
+        // Add unit to selected station
+        station.addUnit(unit);
 
         // Add unit to units list
         for (int i = 0; i < units.length; i++) {
@@ -283,9 +295,6 @@ public class CityRescueImpl implements CityRescue {
                 break;
             }
         }
-
-        // Add unit to selected station
-        station.addUnit(unit);
 
         return unit.unitId;
     }
@@ -304,7 +313,7 @@ public class CityRescueImpl implements CityRescue {
         Unit unit = null;
         int unitIndex = 0;
         for (int i = 0; i < units.length; i++) {
-            if (units[i].unitId == unitId) {
+            if (units[i] != null && units[i].unitId == unitId) {
                 unit = units[i];
                 unitIndex = i;
                 break;
@@ -312,7 +321,7 @@ public class CityRescueImpl implements CityRescue {
         }
         // Guard clause to check if unit exists
         if (unit == null) {
-            throw new IDNotRecognisedException("Station with given stationId does not exist");
+            throw new IDNotRecognisedException("Unit with given unitId does not exist");
         }
         // Guard clause to check if unit is not busy
         if (unit.status == UnitStatus.EN_ROUTE || unit.status == UnitStatus.AT_SCENE) {
@@ -349,7 +358,7 @@ public class CityRescueImpl implements CityRescue {
             throw new IllegalStateException("A unit must be idle for it to be transferred");
         }
 
-        station.removeUnit(unitId);
+        getStation(unit.stationId).removeUnit(unitId);
         station.addUnit(unit);
         unit.x = station.x;
         unit.y = station.y;
@@ -427,10 +436,9 @@ public class CityRescueImpl implements CityRescue {
                 break;
         }
 
-        if (unit.work > 0 && unit.incidentId != 0) {
+        if (unit.work > 0 && unit.status == UnitStatus.AT_SCENE) {
             status += String.format(" WORK=%d", unit.work);
         }
-        System.out.println(status);
         return status;
     }
 
@@ -455,6 +463,9 @@ public class CityRescueImpl implements CityRescue {
         }
         if (severity < 1 || severity > 5) {
             throw new InvalidSeverityException("Invalid severity. Severity must be >= 1 and <= 5");
+        }
+        if (incidentsCounter >= 20) {
+            throw new CapacityExceededException("Maximum number of incidents reached");
         }
         checkValidLocation(x, y);
 
@@ -625,11 +636,12 @@ public class CityRescueImpl implements CityRescue {
     }
 
     /**
-     * Advances the simulation time by one tick. Increases the tick value by one and then:
-     *  - Moves EN_ROUTE units towards incidents
-     *  - Detects when units have arrived at incidents
-     *  - Processes the work ticks of each on-scene unit
-     *  - Detects completed incidents
+     * Advances the simulation time by one tick. Increases the tick value by one and
+     * then:
+     * - Moves EN_ROUTE units towards incidents
+     * - Detects when units have arrived at incidents
+     * - Processes the work ticks of each on-scene unit
+     * - Detects completed incidents
      */
     @Override
     public void tick() {

@@ -19,6 +19,7 @@ public class CityMap {
     public void addObstacle(int x, int y) throws InvalidLocationException {
         try {
             obstacles[x][y] = true;
+            obstaclesCounter++;
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new InvalidLocationException("Location out of bounds");
         }
@@ -26,6 +27,9 @@ public class CityMap {
 
     public void removeObstacle(int x, int y) throws InvalidLocationException {
         try {
+            if (obstacles[x][y]) {
+                obstaclesCounter--;
+            }
             obstacles[x][y] = false;
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new InvalidLocationException("Location out of bounds");
@@ -33,7 +37,8 @@ public class CityMap {
     }
 
     public boolean checkMoveIsLegal(int x, int y) {
-        if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight) return false;
+        if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight)
+            return false;
         return !obstacles[x][y];
     }
 }
