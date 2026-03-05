@@ -18,6 +18,7 @@ public class CityRescueImpl implements CityRescue {
     // ID Counters (used to generate new ids)
     int stationIdCounter = 0;
     int unitIdCounter = 0;
+    int incidentIdCounter = 0;
 
     /**
      * Initialises the CityRescue class by resetting state variables to their
@@ -48,6 +49,8 @@ public class CityRescueImpl implements CityRescue {
         incidentsCounter = 0;
         // Reset ID counters
         stationIdCounter = 0;
+        unitIdCounter = 0;
+        incidentIdCounter = 0;
     }
 
     /**
@@ -230,6 +233,9 @@ public class CityRescueImpl implements CityRescue {
         int[] stationIds = new int[stationsCounter];
         int stationIdsCounter = 0;
         for (Station station : stations) {
+            if (station == null) {
+                continue;
+            }
             stationIds[stationIdsCounter] = station.stationId;
             stationIdsCounter++;
         }
@@ -411,7 +417,7 @@ public class CityRescueImpl implements CityRescue {
         Unit unit = getUnit(unitId);
         // TODO: Output current unit incident (when implemented)
         String status = String.format("U#%d TYPE=%s HOME=%d LOC=(%d,%d) STATUS=%s INCIDENT=%d", unit.unitId,
-                unit.type, unit.stationId, unit.x, unit.y, unit.status, "NOT IMPLEMENTED");
+                unit.type, unit.stationId, unit.x, unit.y, unit.status, 0);
         // TODO: Implement 'work' property when incidents are added
         // if (condition) {
         // status += String.format(" WORK=%d", "NOT IMPLEMENTED");
@@ -420,36 +426,127 @@ public class CityRescueImpl implements CityRescue {
         return status;
     }
 
+    /**
+     * Creates a new incident and adds it to the simulation.
+     * 
+     * @param type     the IncidentType of the incident
+     * @param severity the severity (1-5) of the incident
+     * @param x,y      the position of the incident
+     * @return the incidentId of the new incident
+     * @throws InvalidSeverityException if the incident severity is outside of the
+     *                                  allowed range (1-5)
+     * @throws InvalidLocationException if the given location (x and y) is blocked
+     *                                  by an obstacle or is out of bounds
+     */
     @Override
     public int reportIncident(IncidentType type, int severity, int x, int y)
             throws InvalidSeverityException, InvalidLocationException {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        // Guard clauses
+        if (type == null) {
+            throw new IllegalStateException("Invalid incident type given");
+        }
+        if (severity < 1 || severity > 5) {
+            throw new InvalidSeverityException("Invalid severity. Severity must be >= 1 and <= 5");
+        }
+        checkValidLocation(x, y);
+
+        Incident incident = new Incident(++incidentIdCounter, type, severity, x, y);
+        for (int i = 0; i < incidents.length; i++) {
+            if (incidents[i] == null) {
+                incidents[i] = incident;
+                incidentsCounter += 1;
+                break;
+            }
+        }
+
+        return incident.incidentId;
     }
 
+    /**
+     * Changes an incident's status to CANCELLED and releases any assigned units if
+     * it has been dispatched.
+     * 
+     * @param incidentId the ID of the incident being cancelled
+     * @throws IDNotRecognisedException if no incident exists with the given
+     *                                  incidentId
+     * @throws IllegalStateException    if the incident is in a stage other than
+     *                                  REPORTED or DISPATCHED
+     */
     @Override
     public void cancelIncident(int incidentId) throws IDNotRecognisedException, IllegalStateException {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        Incident incident = getIncident(incidentId);
+        // Guard clause
+        if (incident.status != IncidentStatus.REPORTED && incident.status != IncidentStatus.DISPATCHED) {
+            throw new IllegalStateException(
+                    "An incident can not be cancelled after it has been reported and dispatched");
+        }
+
+        if (incident.status == IncidentStatus.DISPATCHED) {
+            getUnit(incident.unitId).incidentId = 0;
+        }
+        incident.status = IncidentStatus.CANCELLED;
     }
 
+    /**
+     * Updates a given ongoing incidents's severity.
+     * 
+     * @param incidentId  the ID of the incident to be updated
+     * @param newSeverity the new severity of the incident (1-5)
+     * @throws IDNotRecognisedException if no incident exists with the given
+     *                                  incidentId
+     * @throws InvalidSeverityException If the severity is not in the range 1-5
+     * @throws IllegalStateException    if the incident is already in the
+     *                                  RESOLVED/CANCELLED state
+     */
     @Override
     public void escalateIncident(int incidentId, int newSeverity)
             throws IDNotRecognisedException, InvalidSeverityException, IllegalStateException {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        Incident incident = getIncident(incidentId);
+        // Guard clauses
+        if (newSeverity < 1 || newSeverity > 5) {
+            throw new InvalidSeverityException("Invalid severity. Severity must be >= 1 and <= 5");
+        }
+        if (incident.status == IncidentStatus.RESOLVED || incident.status == IncidentStatus.CANCELLED) {
+            throw new IllegalStateException("The incidnet must not be resolved or cancelled already");
+        }
+        incident.severity = newSeverity;
     }
 
+    /**
+     * Provides a list of all current incident IDs.
+     * 
+     * @return a list of incident IDs sorted in ascending order
+     */
     @Override
     public int[] getIncidentIds() {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        int[] incidentIds = new int[incidentsCounter];
+        int incidentIdsCounter = 0;
+        for (Incident incident : incidents) {
+            if (incident == null) {
+                continue;
+            }
+            incidentIds[incidentIdsCounter] = incident.incidentId;
+            incidentIdsCounter++;
+        }
+        Arrays.sort(incidentIds);
+        return incidentIds;
     }
 
+    /**
+     * Returns a formatted string containing information about the given incident.
+     * 
+     * @param incidentId the ID of the incident to be updated
+     * @return a formatted string describing the incident
+     * @throws IDNotRecognisedException if no incident exists with the given
+     *                                  incidentId
+     */
     @Override
     public String viewIncident(int incidentId) throws IDNotRecognisedException {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        Incident incident = getIncident(incidentId);
+        // TODO: Output unit number (when implemented)
+        String status = String.format("I#%d TYPE=%s SEV=%d LOC=(%d,%d) STATUS=%s UNIT=%d", incident.incidentId,
+                incident.type, incident.severity, incident.x, incident.y, incident.status, 0);
+        return status;
     }
 
     @Override
@@ -471,10 +568,19 @@ public class CityRescueImpl implements CityRescue {
         status += String.format("\nSTATIONS=%d UNITS=%d INCIDENTS=%d OBSTACLES=%d",
                 stationsCounter, unitsCounter,
                 incidentsCounter, map.obstaclesCounter);
+
         status += "\nINCIDENTS";
-        // TODO: Implement listing of incidents
-        // List all units
+        // List all incidents
+        for (int incidentId : getIncidentIds()) {
+            try {
+                status += ("\n" + viewIncident(incidentId));
+            } catch (IDNotRecognisedException e) {
+                System.out.println(String.format("I#%d INCIDENT NOT FOUND", incidentId));
+            }
+        }
+
         status += "\nUNITS";
+        // List all units
         for (int unitId : getUnitIds()) {
             try {
                 status += ("\n" + viewUnit(unitId));
@@ -482,7 +588,6 @@ public class CityRescueImpl implements CityRescue {
                 System.out.println(String.format("U#%d UNIT NOT FOUND", unitId));
             }
         }
-
         return status;
     }
 }
